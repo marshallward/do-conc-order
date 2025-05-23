@@ -115,4 +115,5 @@ Platforms
 Absolute numbers are not the point, but here is the platform.
 
 CPU: AMD EPYC 7742 64-core
+
 RAM: TODO?
