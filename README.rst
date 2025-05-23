@@ -58,9 +58,9 @@ Unoptimized (``-O0``)
 Compiler             do concurrent(i,j)   do concurrent(j,i)
 ===================  ==================   ==================
 gfortran 14.0.1      **1.7e-2**           1.7e-1
-ifort 2024.2         5.6e-2               **3.7e-2**
+ifort 2024.2         5.1e-2               **3.7e-2**
 ifx 2025.1           1.6e-1               **2.1e-2**
-nvfortran 25.1       1.7e-1               **1.8e-2**
+nvfortran 25.1       1.5e-1               **1.8e-2**
 ===================  ==================   ==================
 
 With optimization (``-O2``)
@@ -69,9 +69,9 @@ With optimization (``-O2``)
 Compiler             do concurrent(i,j)   do concurrent(j,i)
 ===================  ==================   ==================
 gfortran 14.0.1      **3.3e-3**           **3.3e-3**
-ifort 2024.2         4.7e-2               **2.6e-3**
-ifx 2025.1           2.6e-1               **3.7e-3**
-nvfortran 25.1       **3.2e-3**           **3.2e-3**
+ifort 2024.2         4.3e-2               **2.4e-3**
+ifx 2025.1           2.6e-1               **3.5e-3**
+nvfortran 25.1       **2.9e-3**           **2.9e-3**
 ===================  ==================   ==================
 
 The "winners" in each state are shown in bold.
@@ -98,10 +98,8 @@ Conclusion
 
 * Nvidia and Intel seem to prefer outer-to-inner.
 
-* After light optimization, GNU and Nvidia show now preference.  Intel still
+* After light optimization, GNU and Nvidia show no preference.  Intel still
   shows an outer-to-inner preference.
-
-* ifx seems quite slow(?)
 
 Our decision: **Write outer to inner loops**.
 
