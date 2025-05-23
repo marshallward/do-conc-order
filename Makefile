@@ -23,4 +23,4 @@ do_conc_order.o: do_conc_order.f90
 	$(FC) $(FCFLAGS) -c $<
 
 clean:
-	rm -f *.o *.mod
+	rm -f run *.o *.mod
