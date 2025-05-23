@@ -1,6 +1,6 @@
 use, intrinsic :: iso_fortran_env, only : int64
 
-use do_conc_order, only : do_conc_ij, do_conc_ji
+use do_conc_order
 
 integer, parameter :: m = 2**10, n = 2**12
 real :: a(m,n), b(m,n), c(m,n), d(m,n)
@@ -20,10 +20,11 @@ b(:,:) = 2.2
 c(:,:) = 3.3
 
 ! Force the CPU into the highest frequency step
+! TODO: function pointers would help out here
 
 n_reps = 1
-
 t = 0.
+
 do while (t < t_max)
   call system_clock(c_start)
   do r = 1, n_reps
@@ -37,24 +38,72 @@ end do
 
 ! Generate do concurrent (i=, j=) timings
 
-call system_clock(c_start)
-do r = 1, n_reps
-  call do_conc_ij(a,b,c,d)
-end do
-call system_clock(c_end)
+n_reps = 1
+t = 0.
+do while (t < t_max)
+  call system_clock(c_start)
+  do r = 1, n_reps
+    call do_conc_ij(a,b,c,d)
+  end do
+  call system_clock(c_end)
 
+  n_reps = n_reps * 2
+  t = real(c_end - c_start) / real(c_rate)
+end do
 print '("do concurrent(i=, j=) ", es24.16)', &
+    real(c_end - c_start) / real(c_rate) / n_reps
+
+! Generate do (i=, j=) timings
+
+n_reps = 1
+t = 0.
+do while (t < t_max)
+  call system_clock(c_start)
+  do r = 1, n_reps
+    call do_ij(a,b,c,d)
+  end do
+  call system_clock(c_end)
+
+  n_reps = n_reps * 2
+  t = real(c_end - c_start) / real(c_rate)
+end do
+print '("do (i=, j=) ", es24.16)', &
     real(c_end - c_start) / real(c_rate) / n_reps
 
 ! Generate do concurrent (j=, i=) timings
 
-call system_clock(c_start)
-do r = 1, n_reps
-call do_conc_ji(a,b,c,d)
+n_reps = 1
+t = 0.
+do while (t < t_max)
+  call system_clock(c_start)
+  do r = 1, n_reps
+    call do_conc_ji(a,b,c,d)
+  end do
+  call system_clock(c_end)
+
+  n_reps = n_reps * 2
+  t = real(c_end - c_start) / real(c_rate)
 end do
-call system_clock(c_end)
 
 print '("do concurrent(j=, i=) ", es24.16)', &
+    real(c_end - c_start) / real(c_rate) / n_reps
+
+! Generate do (j=, i=) timings
+
+n_reps = 1
+t = 0.
+do while (t < t_max)
+  call system_clock(c_start)
+  do r = 1, n_reps
+    call do_ji(a,b,c,d)
+  end do
+  call system_clock(c_end)
+
+  n_reps = n_reps * 2
+  t = real(c_end - c_start) / real(c_rate)
+end do
+
+print '("do (j=, i=) ", es24.16)', &
     real(c_end - c_start) / real(c_rate) / n_reps
 
 end
