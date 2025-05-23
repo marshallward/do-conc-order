@@ -32,8 +32,8 @@ do while (t < t_max)
   end do
   call system_clock(c_end)
 
-  n_reps = n_reps * 2
   t = real(c_end - c_start) / real(c_rate)
+  if (t < t_max) n_reps = n_reps * 2
 end do
 
 ! Generate do concurrent (i=, j=) timings
@@ -47,8 +47,8 @@ do while (t < t_max)
   end do
   call system_clock(c_end)
 
-  n_reps = n_reps * 2
   t = real(c_end - c_start) / real(c_rate)
+  if (t < t_max) n_reps = n_reps * 2
 end do
 print '("do concurrent(i=, j=) ", es24.16)', &
     real(c_end - c_start) / real(c_rate) / n_reps
@@ -64,8 +64,8 @@ do while (t < t_max)
   end do
   call system_clock(c_end)
 
-  n_reps = n_reps * 2
   t = real(c_end - c_start) / real(c_rate)
+  if (t < t_max) n_reps = n_reps * 2
 end do
 print '("do (i=, j=) ", es24.16)', &
     real(c_end - c_start) / real(c_rate) / n_reps
@@ -81,8 +81,8 @@ do while (t < t_max)
   end do
   call system_clock(c_end)
 
-  n_reps = n_reps * 2
   t = real(c_end - c_start) / real(c_rate)
+  if (t < t_max) n_reps = n_reps * 2
 end do
 
 print '("do concurrent(j=, i=) ", es24.16)', &
@@ -99,8 +99,8 @@ do while (t < t_max)
   end do
   call system_clock(c_end)
 
-  n_reps = n_reps * 2
   t = real(c_end - c_start) / real(c_rate)
+  if (t < t_max) n_reps = n_reps * 2
 end do
 
 print '("do (j=, i=) ", es24.16)', &

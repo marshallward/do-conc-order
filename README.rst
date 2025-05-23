@@ -49,17 +49,18 @@ then compare the time.
 Results (so far)
 ----------------
 
-Time in seconds to complete one loop (averaged over many repetitions).
+Time in seconds to complete one loop (averaged over many repetitions).  (Lower
+is faster)
 
 Unoptimized (``-O0``)
 
 ===================  ==================   ==================
 Compiler             do concurrent(i,j)   do concurrent(j,i)
 ===================  ==================   ==================
-gfortran 14.0.1 -O0  **1.8e-2**           1.9e-1
-ifort 2024.2 -O0     5.1e-2               **3.7e-2**
-ifx 2025.1 -O0       1.5e-1               **2.1e-2**
-nvfortran 25.1 -O0   1.4e-1               **1.8e-2**
+gfortran 14.0.1      **1.7e-2**           1.7e-1
+ifort 2024.2         5.6e-2               **3.7e-2**
+ifx 2025.1           1.6e-1               **2.1e-2**
+nvfortran 25.1       1.7e-1               **1.8e-2**
 ===================  ==================   ==================
 
 With optimization (``-O2``)
@@ -67,10 +68,10 @@ With optimization (``-O2``)
 ===================  ==================   ==================
 Compiler             do concurrent(i,j)   do concurrent(j,i)
 ===================  ==================   ==================
-gfortran 14.0.1 -O2  **3.0e-3**           **3.0e-3**
-ifort 2024.2 -O2     4.3e-2               **2.3e-3**
-ifx 2025.1 -O2       2.5e-1               **3.5e-3**
-nvfortran 25.1 -O2   **2.8e-3**           **2.8e-3**
+gfortran 14.0.1      **3.3e-3**           **3.3e-3**
+ifort 2024.2         4.7e-2               **2.6e-3**
+ifx 2025.1           2.6e-1               **3.7e-3**
+nvfortran 25.1       **3.2e-3**           **3.2e-3**
 ===================  ==================   ==================
 
 The "winners" in each state are shown in bold.
@@ -78,20 +79,29 @@ The "winners" in each state are shown in bold.
 There is a bit of uncertainty in the second digit, but AFAIK not more than one
 or two digits.
 
-(TODO: Asm inspection?)
+Other observations based on ``do concurrent`` vs ``do ; do``.  (I will try to
+add the numbers later.)
+
+* ifort 2024.2 at ``-O2`` will reorder a ``do i ; do j`` loop in the "wrong"
+  order, but not the (orderless) ``do concurrent`` loop.
+
+* For GNU at ``-O0`` the ``do concurrent(i,j)`` is slightly faster than nested
+  ``do j ; do i``.
+
+* GNU ``-O2`` does not loop-reorder ``do i ; do j``.
 
 
 Conclusion
 ----------
 
-GNU seems to prefer inner-to-outer. 
+* GNU seems to prefer inner-to-outer.
 
-Nvidia and Intel seem to prefer outer-to-inner.
+* Nvidia and Intel seem to prefer outer-to-inner.
 
-After light optimization, GNU and Nvidia show now preference.  Intel still
-shows an outer-to-inner preference.
+* After light optimization, GNU and Nvidia show now preference.  Intel still
+  shows an outer-to-inner preference.
 
-And ifx seems very slow, although perhaps that's not really the message here.
+* ifx seems quite slow(?)
 
 Our decision: **Write outer to inner loops**.
 
