@@ -6,7 +6,11 @@ integer, parameter :: m = 2**10, n = 2**12
 real :: a(m,n), b(m,n), c(m,n), d(m,n)
 
 integer(int64) :: c_start, c_end, c_rate, c_max
-integer :: t
+real :: t
+real, parameter :: t_max = 1.
+
+integer :: r
+integer :: n_reps
 
 ! Clock setup
 call system_clock(count_rate=c_rate, count_max=c_max)
@@ -15,25 +19,42 @@ a(:,:) = 1.1
 b(:,:) = 2.2
 c(:,:) = 3.3
 
-! TODO: Prime the CPU into turbo mode
-do t = 1, 100
-  call do_conc_ij(a,b,c,d)
+! Force the CPU into the highest frequency step
+
+n_reps = 1
+
+t = 0.
+do while (t < t_max)
+  call system_clock(c_start)
+  do r = 1, n_reps
+    call do_conc_ij(a,b,c,d)
+  end do
+  call system_clock(c_end)
+
+  n_reps = n_reps * 2
+  t = real(c_end - c_start) / real(c_rate)
 end do
 
+! Generate do concurrent (i=, j=) timings
+
 call system_clock(c_start)
-do t = 1, 100
+do r = 1, n_reps
   call do_conc_ij(a,b,c,d)
 end do
 call system_clock(c_end)
 
-print '("do concurrent(i=, j=) ", f24.16)', real(c_end - c_start) / real(c_rate)
+print '("do concurrent(i=, j=) ", es24.16)', &
+    real(c_end - c_start) / real(c_rate) / n_reps
+
+! Generate do concurrent (j=, i=) timings
 
 call system_clock(c_start)
-do t = 1, 100
+do r = 1, n_reps
 call do_conc_ji(a,b,c,d)
 end do
 call system_clock(c_end)
 
-print '("do concurrent(j=, i=) ", f24.16)', real(c_end - c_start) / real(c_rate)
+print '("do concurrent(j=, i=) ", es24.16)', &
+    real(c_end - c_start) / real(c_rate) / n_reps
 
 end
